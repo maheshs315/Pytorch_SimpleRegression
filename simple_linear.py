@@ -39,12 +39,22 @@ X_tensor[0,:]
 class ANN_first(nn.Module):
     def __init__(self,input_dim):
         super(ANN_first,self).__init__()
-        self.l1=nn.Linear(input_dim,1)
-        
+        self.l1=nn.Linear(input_dim,10)
+        self.r1=nn.ReLU()
+        self.l2=nn.Linear(10,20)
+        self.r2=nn.ReLU()
+        self.l3=nn.Linear(20,10)
+        self.r3=nn.ReLU()
+        self.l4=nn.Linear(10,1)
 
     def forward(self,x):
         out=self.l1(x)
-        
+        out=self.r1(out)
+        out=self.l2(out)
+        out=self.r2(out)
+        out=self.l3(out)
+        out=self.r3(out)
+        out=self.l4(out)
         return out
 
 input_dim=x_numpy.shape[1]
@@ -72,21 +82,25 @@ else:
 x_train=X_tensor.to(device)
 y_train=y_tensor.to(device)
 
+batch_size=10
 
-
-n_epochs=1000
+n_epochs=10000
 
 for epoch in range(n_epochs):
     
-    y_pred=model(x_train)
-    l=loss1(y_pred,y_train)
-    
-    optim1.zero_grad()
-    l.backward()
-    optim1.step()
-    
-    
-    print(f'epoch {epoch+1},loss={l}')
+    for iter in range(0,220,batch_size):
+        x_train=X_tensor[iter:iter+batch_size,:].to(device)
+        y_train=y_tensor[iter:iter+batch_size].to(device)
+        
+        y_pred=model(x_train)
+        l=loss1(y_pred,y_train)
+        
+        optim1.zero_grad()
+        l.backward()
+        optim1.step()
+        
+        if((epoch+1)%10==0):
+            print(f'epoch {epoch+1},loss={l}')
 
 
 
